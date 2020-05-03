@@ -15,15 +15,12 @@ public struct MineKit {
     
     public func connectToServer() {
         sendPacket(packet: HandshakePacket(withHostname: hostname, andPort: port))
-        sendPacket(packet: LoginStartPacket(withUsername: username))
+        sendPacket(packet: LoginStartPacket(withUsername: "ConorDoesMC"))
     }
     
     func sendPacket(packet: MineKitPacket) {
-        let buffer = context.channel.allocator.buffer(capacity: 11)
-        do {
-            try context.writeAndFlush(NIOAny(packet.getBuffer(withBuffer: buffer)), promise: nil)
-        } catch let error {
-            print(error)
-        }
+        print("Sending packet: \(String(describing: packet))")
+        context.writeAndFlush(NIOAny(packet), promise: nil)
+        print("Sent packet: \(String(describing: packet))")
     }
 }

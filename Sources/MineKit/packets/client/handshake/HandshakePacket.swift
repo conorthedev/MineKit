@@ -9,6 +9,8 @@ import Foundation
 import NIO
 
 public class HandshakePacket : MineKitPacket {
+    public var packetID: UInt8 = 0x00
+    
     private let hostname: String
     private let port: Int
     
@@ -17,20 +19,18 @@ public class HandshakePacket : MineKitPacket {
         self.port = andPort
     }
     
-    public func getBuffer(withBuffer: ByteBuffer) throws -> ByteBuffer {
-        var mkBuffer = MineKitBuffer(withByteBuffer: withBuffer)
-
+    public func writeTo(buffer: inout MineKitBuffer) throws {
         // Header
-        mkBuffer.writeBytes(bytes: [0x10, 0x00])
+        //mkBuffer.writeBytes(bytes: [0x10, 0x00])
         // Protocol Version
-        mkBuffer.writeVarInt(value: MineKitProtocolVersion.v1_15_2)
+        buffer.writeVarInt(value: MineKitProtocolVersion.v1_15_2)
         // Hostname
-        try mkBuffer.writeString(value: hostname, max: 255)
+        try buffer.writeString(value: hostname, max: 255)
         // Port
-        mkBuffer.writeUShort(value: port)
+        buffer.writeUShort(value: port)
         // Next state
-        mkBuffer.writeVarInt(value: 2)
+        buffer.writeVarInt(value: 2)
         
-        return mkBuffer.getBuffer()
+        //return mkBuffer.getBuffer()
     }
 }

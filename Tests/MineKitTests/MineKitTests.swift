@@ -7,8 +7,9 @@ final class MineKitTests: XCTestCase, ChannelInboundHandler {
     let defaultHost = "localhost"
     let defaultPort: Int = 25565
     
-    public typealias InboundIn = ByteBuffer
-    public typealias OutboundOut = ByteBuffer
+    public typealias InboundIn = MineKitPacket
+    public typealias OutboundIn = MineKitPacket
+    public typealias OutboundOut = MineKitPacket
            
     public func channelActive(context: ChannelHandlerContext) {
         print("Client connected to \(context.remoteAddress!)")
@@ -17,7 +18,7 @@ final class MineKitTests: XCTestCase, ChannelInboundHandler {
 
     public func channelRead(context: ChannelHandlerContext, data: NIOAny) {
         let byteBuffer = self.unwrapInboundIn(data)
-        print("recieved: \(String(buffer: byteBuffer))")
+        print("recieved: \(byteBuffer))")
     }
 
     public func errorCaught(context: ChannelHandlerContext, error: Error) {
@@ -30,7 +31,9 @@ final class MineKitTests: XCTestCase, ChannelInboundHandler {
         let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
         let bootstrap = ClientBootstrap(group: group)
             .channelInitializer { channel in
-                channel.pipeline.addHandler(self)
+                channel.pipeline.addHandler(MessageToByteHandler(ByteBufferToLengthBufferEncoder()), name: "1", position: ChannelPipeline.Position.first)
+                channel.pipeline.addHandler(self, name: "3", position: ChannelPipeline.Position.last)
+                return channel.pipeline.addHandler(MessageToByteHandler(PacketToByteBufEncoder()), name: "2", position: ChannelPipeline.Position.before(self))
             }
         defer {
             try! group.syncShutdownGracefully()

@@ -9,5 +9,6 @@ import Foundation
 import NIO
 
 public protocol MineKitPacket {
-    func getBuffer(withBuffer: ByteBuffer) throws -> ByteBuffer
+    var packetID: UInt8 { get }
+    func writeTo(buffer: inout MineKitBuffer) throws
 }
