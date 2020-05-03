@@ -12,17 +12,17 @@ final class MineKitTests: XCTestCase, ChannelInboundHandler {
     public typealias OutboundOut = MineKitPacket
            
     public func channelActive(context: ChannelHandlerContext) {
-        print("Client connected to \(context.remoteAddress!)")
+        print("🌐 Client connected to \(context.remoteAddress!)")
         MineKit(hostname: defaultHost, port: defaultPort, context: context, username: "ConorDoesMC").connectToServer()
     }
 
     public func channelRead(context: ChannelHandlerContext, data: NIOAny) {
         let byteBuffer = self.unwrapInboundIn(data)
-        print("recieved: \(byteBuffer))")
+        print("📮 Recieved: \(byteBuffer))")
     }
 
     public func errorCaught(context: ChannelHandlerContext, error: Error) {
-        print("error: ", error)
+        print("🚫 Error: ", error)
         context.close(promise: nil)
         XCTFail("Error occured: \(error)")
     }
@@ -31,7 +31,7 @@ final class MineKitTests: XCTestCase, ChannelInboundHandler {
         let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
         let bootstrap = ClientBootstrap(group: group)
             .channelInitializer { channel in
-                channel.pipeline.addHandler(MessageToByteHandler(ByteBufferToLengthBufferEncoder()), name: "1", position: ChannelPipeline.Position.first)
+                channel.pipeline.addHandler(MessageToByteHandler(ByteBufToLengthBufferEncoder()), name: "1", position: ChannelPipeline.Position.first)
                 channel.pipeline.addHandler(self, name: "3", position: ChannelPipeline.Position.last)
                 return channel.pipeline.addHandler(MessageToByteHandler(PacketToByteBufEncoder()), name: "2", position: ChannelPipeline.Position.before(self))
             }
@@ -59,11 +59,11 @@ final class MineKitTests: XCTestCase, ChannelInboundHandler {
             // Will be closed after we echo-ed back to the server.
             try channel.closeFuture.wait()
         } catch let error {
-            print(error)
+            print("🚫 Error: \(error)")
             XCTFail("Error occured: \(error)")
         }
 
-        print("Client closed")
+        print("🚪 Client closed!")
         XCTAssertTrue(true)
     }
 

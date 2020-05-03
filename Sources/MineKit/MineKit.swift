@@ -19,8 +19,8 @@ public struct MineKit {
     }
     
     func sendPacket(packet: MineKitPacket) {
-        print("Sending packet: \(String(describing: packet))")
+        print("📨 Sending packet: \(String(describing: packet))")
         context.writeAndFlush(NIOAny(packet), promise: nil)
-        print("Sent packet: \(String(describing: packet))")
+        print("📬 Sent packet: \(String(describing: packet))")
     }
 }
