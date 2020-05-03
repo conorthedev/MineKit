@@ -11,7 +11,7 @@ let package = Package(
             targets: ["MineKit"]),
     ],
     dependencies: [
-        .package(name: "swift-nio", url: "https://github.com/apple/swift-nio.git", from: Version("2.16.0")),
+        .package(name: "swift-nio", url: "https://github.com/apple/swift-nio.git", from: Version(2, 16, 0)),
     ],
     targets: [
         .target(
