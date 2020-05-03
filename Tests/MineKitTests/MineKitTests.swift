@@ -12,19 +12,12 @@ final class MineKitTests: XCTestCase, ChannelInboundHandler {
            
     public func channelActive(context: ChannelHandlerContext) {
         print("Client connected to \(context.remoteAddress!)")
-        print("sending handshake")
-        MineKit().sendPacket(packet: HandshakePacket(ip: defaultHost), withContext: context)
-        print("Sent handshake")
-        print("sending login")
-        MineKit().sendLoginStartPacket(withContext: context)
-        print("sent login")
+        MineKit(hostname: defaultHost, port: defaultPort, context: context, username: "ConorDoesMC").connectToServer()
     }
 
     public func channelRead(context: ChannelHandlerContext, data: NIOAny) {
         let byteBuffer = self.unwrapInboundIn(data)
         print("recieved: \(String(buffer: byteBuffer))")
-        
-        //MineKit().sendPacket(packet: LoginPacket(name: "ConorDoesMC"), withContext: context)
     }
 
     public func errorCaught(context: ChannelHandlerContext, error: Error) {
@@ -35,7 +28,6 @@ final class MineKitTests: XCTestCase, ChannelInboundHandler {
     func testExample() {
         let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
         let bootstrap = ClientBootstrap(group: group)
-            // Enable SO_REUSEADDR.
             .channelInitializer { channel in
                 channel.pipeline.addHandler(self)
             }
