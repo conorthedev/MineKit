@@ -21,11 +21,12 @@ final class MineKitTests: XCTestCase, ChannelInboundHandler {
     }
 
     public func errorCaught(context: ChannelHandlerContext, error: Error) {
-       print("error: ", error)
-       context.close(promise: nil)
+        print("error: ", error)
+        context.close(promise: nil)
+        XCTFail("Error occured: \(error)")
     }
 
-    func testExample() {
+    func testLogin() {
         let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
         let bootstrap = ClientBootstrap(group: group)
             .channelInitializer { channel in
@@ -56,13 +57,14 @@ final class MineKitTests: XCTestCase, ChannelInboundHandler {
             try channel.closeFuture.wait()
         } catch let error {
             print(error)
+            XCTFail("Error occured: \(error)")
         }
 
         print("Client closed")
-
+        XCTAssertTrue(true)
     }
 
     static var allTests = [
-        ("testExample", testExample),
+        ("testLogin", testLogin),
     ]
 }

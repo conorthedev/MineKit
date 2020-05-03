@@ -8,21 +8,25 @@
 import Foundation
 import NIO
 
+enum MKBufferError: Error {
+    case writeError(String)
+}
+
 public struct MineKitBuffer {
     private var buffer: ByteBuffer
-    init(withByteBuffer: ByteBuffer) {
+    public init(withByteBuffer: ByteBuffer) {
         buffer = withByteBuffer
     }
     
-    mutating func writeBytes(bytes: [UInt8]) {
+    public mutating func writeBytes(bytes: [UInt8]) {
         buffer.writeBytes(bytes)
     }
     
-    mutating func writeByte(value: Int) {
+    public mutating func writeByte(value: Int) {
         buffer.writeBytes([UInt8(value)])
     }
     
-    mutating func writeVarInt(value: Int) {
+    public mutating func writeVarInt(value: Int) {
         var toWrite = value
         repeat {
             var temp = (toWrite & 0b01111111)
@@ -34,20 +38,20 @@ public struct MineKitBuffer {
         } while (toWrite != 0)
     }
     
-    mutating func writeString(value: String, max: Int) {
+    public mutating func writeString(value: String, max: Int) throws {
         if(value.count > max) {
-            print("String length higher than expected! | Got \(value.count), expected \(max)")
+            throw MKBufferError.writeError("String length larger than expected! | Got \(value.count), expected \(max)")
         }
         let bytes = value.utf8.map{UInt8($0)}
         writeVarInt(value: bytes.count)
         writeBytes(bytes: bytes)
     }
     
-    mutating func writeUShort(value: Int) {
+    public mutating func writeUShort(value: Int) {
         writeShort(value: value)
     }
     
-    mutating func writeShort(value: Int) {
+    public mutating func writeShort(value: Int) {
         buffer.writeInteger(Int16(value))
     }
     

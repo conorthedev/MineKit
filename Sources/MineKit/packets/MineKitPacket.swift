@@ -8,6 +8,6 @@
 import Foundation
 import NIO
 
-protocol Packet {
-    func getBuffer(withBuffer: ByteBuffer) -> ByteBuffer
+public protocol MineKitPacket {
+    func getBuffer(withBuffer: ByteBuffer) throws -> ByteBuffer
 }

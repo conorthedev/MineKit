@@ -6,7 +6,7 @@ public struct MineKit {
     private let username: String
     private let context: ChannelHandlerContext
     
-    init(hostname: String, port: Int, context: ChannelHandlerContext, username: String) {
+    public init(hostname: String, port: Int, context: ChannelHandlerContext, username: String) {
         self.hostname = hostname
         self.port = port
         self.context = context
@@ -18,8 +18,12 @@ public struct MineKit {
         sendPacket(packet: LoginStartPacket(withUsername: username))
     }
     
-    func sendPacket(packet: Packet) {
+    func sendPacket(packet: MineKitPacket) {
         let buffer = context.channel.allocator.buffer(capacity: 11)
-        context.writeAndFlush(NIOAny(packet.getBuffer(withBuffer: buffer)), promise: nil)
+        do {
+            try context.writeAndFlush(NIOAny(packet.getBuffer(withBuffer: buffer)), promise: nil)
+        } catch let error {
+            print(error)
+        }
     }
 }
