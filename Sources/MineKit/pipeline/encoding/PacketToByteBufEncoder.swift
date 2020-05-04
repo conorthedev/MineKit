@@ -15,6 +15,6 @@ final class PacketToByteBufEncoder : MessageToByteEncoder {
         MineKitCoderUtils.writeVarInt(withValue: Int(data.packetID), toBuffer: &out)
         var mkBuffer = MineKitBuffer(withByteBuffer: out)
         try data.writeTo(buffer: &mkBuffer)
-        out = mkBuffer.getBuffer()
+        out = mkBuffer.buffer
     }
 }

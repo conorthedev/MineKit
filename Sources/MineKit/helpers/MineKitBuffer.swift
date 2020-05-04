@@ -14,7 +14,7 @@ enum MKBufferError: Error {
 }
 
 public struct MineKitBuffer {
-    private var buffer: ByteBuffer
+    public var buffer: ByteBuffer
     public init(withByteBuffer: ByteBuffer) {
         buffer = withByteBuffer
     }
@@ -28,8 +28,7 @@ public struct MineKitBuffer {
     }
     
     public mutating func readByte() -> UInt8 {
-        let byte = buffer.getInteger(at: buffer.readerIndex, endianness: Endianness.big, as: UInt8.self)
-        buffer.moveReaderIndex(forwardBy: 1)
+        let byte = buffer.readInteger(endianness: Endianness.big, as: UInt8.self)
         return byte ?? 0
     }
     
@@ -52,30 +51,19 @@ public struct MineKitBuffer {
         repeat {
             read = Int(readByte())
             let value = read & 0b01111111
-            result = result | (value >> (7 * numRead))
+            result = result | (value << (7 * numRead))
             numRead += 1
-            if(numRead > 5 || numRead > buffer.readableBytes) {
+            if(numRead > 5) {
                 throw MKBufferError.readError("VarInt too large!")
             }
         } while((read & 0b10000000) != 0)
         return result
     }
     
-    /*
-     override fun readVarInt(): Int {
-        var numRead = 0
-        var result = 0
-        var read: Int
-        do {
-            read = readByte().toInt()
-            val value = read and 0b01111111
-            result = result or (value shl (7 * numRead))
-            numRead++
-            if (numRead > 5) error("VarInt too big")
-        } while ((read and 0b10000000) != 0)
-        return result
+    public mutating func readString() throws -> String {
+        let stringLength = try self.readVarInt()
+        return buffer.readString(length: stringLength)!
     }
-     */
     
     public mutating func writeString(value: String, max: Int) throws {
         if(value.count > max) {
@@ -92,9 +80,5 @@ public struct MineKitBuffer {
     
     public mutating func writeShort(value: Int) {
         buffer.writeInteger(Int16(value))
-    }
-    
-    public func getBuffer() -> ByteBuffer {
-        return buffer
     }
 }

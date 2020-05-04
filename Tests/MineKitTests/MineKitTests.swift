@@ -7,8 +7,8 @@ final class MineKitTests: XCTestCase, ChannelInboundHandler {
     let defaultHost = "systemless.me"
     let defaultPort: Int = 25565
 
-    public typealias InboundIn = ByteBuffer
-    public typealias OutboundIn = ByteBuffer
+    public typealias InboundIn = MineKitPacket
+    public typealias OutboundIn = MineKitPacket
     public typealias OutboundOut = MineKitPacket
            
     public func channelActive(context: ChannelHandlerContext) {
@@ -18,11 +18,12 @@ final class MineKitTests: XCTestCase, ChannelInboundHandler {
     }
 
     public func channelRead(context: ChannelHandlerContext, data: NIOAny) {
-        let byteBuffer = self.unwrapInboundIn(data)
+        let packet = self.unwrapInboundIn(data)
+        print("💬 Got packet: \(packet)")
     }
 
     public func errorCaught(context: ChannelHandlerContext, error: Error) {
-        print("🚫 Error: ", error)
+        print("🚫 Error:", error)
         context.close(promise: nil)
         XCTFail("Error occured: \(error)")
     }
