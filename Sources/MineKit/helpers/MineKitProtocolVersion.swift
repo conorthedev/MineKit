@@ -7,6 +7,6 @@
 
 import Foundation
 
-public struct MineKitProtocolVersion {
-    public static var v1_15_2 = 578
+public enum MineKitProtocolVersion : Int {
+    case v1_15_2 = 578
 }

@@ -4,21 +4,21 @@ import NIO
 @testable import MineKit
 
 final class MineKitTests: XCTestCase, ChannelInboundHandler {
-    let defaultHost = "localhost"
+    let defaultHost = "systemless.me"
     let defaultPort: Int = 25565
-    
-    public typealias InboundIn = MineKitPacket
-    public typealias OutboundIn = MineKitPacket
+
+    public typealias InboundIn = ByteBuffer
+    public typealias OutboundIn = ByteBuffer
     public typealias OutboundOut = MineKitPacket
            
     public func channelActive(context: ChannelHandlerContext) {
         print("🌐 Client connected to \(context.remoteAddress!)")
-        MineKit(hostname: defaultHost, port: defaultPort, context: context, username: "ConorDoesMC").connectToServer()
+        let minekit = MineKit(hostname: defaultHost, port: defaultPort, context: context, username: "ConorDoesMC")
+        minekit.connectToServer()
     }
 
     public func channelRead(context: ChannelHandlerContext, data: NIOAny) {
         let byteBuffer = self.unwrapInboundIn(data)
-        print("📮 Recieved: \(byteBuffer))")
     }
 
     public func errorCaught(context: ChannelHandlerContext, error: Error) {
@@ -31,6 +31,7 @@ final class MineKitTests: XCTestCase, ChannelInboundHandler {
         let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
         let bootstrap = ClientBootstrap(group: group)
             .channelInitializer { channel in
+                channel.pipeline.addHandler(ByteToMessageHandler(ByteBufToPacketDecoder()))
                 channel.pipeline.addHandler(MessageToByteHandler(ByteBufToLengthBufferEncoder()), name: "1", position: ChannelPipeline.Position.first)
                 channel.pipeline.addHandler(self, name: "3", position: ChannelPipeline.Position.last)
                 return channel.pipeline.addHandler(MessageToByteHandler(PacketToByteBufEncoder()), name: "2", position: ChannelPipeline.Position.before(self))
