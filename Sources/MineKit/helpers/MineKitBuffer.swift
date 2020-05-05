@@ -8,7 +8,7 @@
 import Foundation
 import NIO
 
-enum MKBufferError: Error {
+enum MineKitBufferError: Error {
     case writeError(String)
     case readError(String)
 }
@@ -54,7 +54,7 @@ public struct MineKitBuffer {
             result = result | (value << (7 * numRead))
             numRead += 1
             if(numRead > 5) {
-                throw MKBufferError.readError("VarInt too large!")
+                throw MineKitBufferError.readError("VarInt too large!")
             }
         } while((read & 0b10000000) != 0)
         return result
@@ -67,7 +67,7 @@ public struct MineKitBuffer {
     
     public mutating func writeString(value: String, max: Int) throws {
         if(value.count > max) {
-            throw MKBufferError.writeError("String length larger than expected! | Got \(value.count), expected \(max)")
+            throw MineKitBufferError.writeError("String length larger than expected! | Got \(value.count), expected \(max)")
         }
         let bytes = value.utf8.map{UInt8($0)}
         writeVarInt(value: bytes.count)

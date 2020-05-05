@@ -49,17 +49,17 @@ public class JoinGameReader : PacketReader {
         
         let eid = mutableBuffer.buffer.readInteger(endianness: .big, as: Int32.self)
         if(eid == nil) {
-            throw MKBufferError.readError("Entity ID is nil!")
+            throw MineKitBufferError.readError("Entity ID is nil!")
         }
                 
         let gamemode = mutableBuffer.readByte()
         let dimension = mutableBuffer.buffer.readInteger(endianness: .big, as: Int32.self)
         if(dimension == nil) {
-            throw MKBufferError.readError("Dimension is nil!")
+            throw MineKitBufferError.readError("Dimension is nil!")
         }
         let hashedSeed = mutableBuffer.buffer.readInteger(endianness: .big, as: Int64.self)
         if(eid == nil) {
-            throw MKBufferError.readError("Hashed Seed is nil!")
+            throw MineKitBufferError.readError("Hashed Seed is nil!")
         }
         let maxPlayers = mutableBuffer.readByte()
         let levelType = try mutableBuffer.readString()

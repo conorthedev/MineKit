@@ -8,7 +8,7 @@
 import Foundation
 import NIO
 
-public enum MKPacketError : Error {
+public enum MineKitPacketError : Error {
     case cannotParse(String)
 }
 
@@ -43,7 +43,7 @@ final class ByteBufToPacketDecoder : ByteToMessageDecoder {
             packetLength = packetLength | (value << (7 * numRead))
             numRead += 1
             if(numRead > 5) {
-                throw MKBufferError.readError("VarInt too large!")
+                throw MineKitBufferError.readError("VarInt too large!")
             }
         } while((read & 0b10000000) != 0)
 
@@ -70,7 +70,7 @@ final class ByteBufToPacketDecoder : ByteToMessageDecoder {
             buffer.moveReaderIndex(forwardBy: buffer.readableBytes)
             return .needMoreData
         } else {
-            throw MKPacketError.cannotParse("Unable to parse packet: 0x\(String(format:"%02X", packetID))")
+            throw MineKitPacketError.cannotParse("Unable to parse packet: 0x\(String(format:"%02X", packetID))")
         }
     }
 }

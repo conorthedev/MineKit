@@ -11,7 +11,7 @@ import MineKit
 
 class MineKitBufferTests: XCTestCase {
     /*
-     This test is verifying that the exception is thrown (see MKBufferError#writeError) when writing a string and you specify a max that is lower than the actual
+     This test is verifying that the exception is thrown (see MineKitBufferError#writeError) when writing a string and you specify a max that is lower than the actual
      */
     func testWriteString() throws {
         var mineKitBuffer = MineKitBuffer(withByteBuffer: ByteBuffer(ByteBufferView()))
