@@ -4,7 +4,7 @@ import NIO
 @testable import MineKit
 
 final class MineKitTests: XCTestCase, ChannelInboundHandler {
-    let defaultHost = "systemless.me"
+    let defaultHost = "localhost"
     let defaultPort: Int = 25565
 
     public typealias InboundIn = MineKitPacket
@@ -19,7 +19,18 @@ final class MineKitTests: XCTestCase, ChannelInboundHandler {
 
     public func channelRead(context: ChannelHandlerContext, data: NIOAny) {
         let packet = self.unwrapInboundIn(data)
-        print("💬 Got packet: \(packet)")
+        let handler = MineKitRequestManager.packetHandlerMap[packet.packetID]
+
+        print("💬 Got packet \(String(describing: packet))")
+        
+        if(handler != nil) {
+            let resp = handler!.handle(context: context, packet: packet)
+            if(resp == .success) {
+                print("✅ Successfully handled packet \(String(describing: packet))")
+            } else {
+                print("🚫 Failed to handle packet, see stacktrace for errors")
+            }
+        }
     }
 
     public func errorCaught(context: ChannelHandlerContext, error: Error) {
@@ -32,9 +43,9 @@ final class MineKitTests: XCTestCase, ChannelInboundHandler {
         let group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
         let bootstrap = ClientBootstrap(group: group)
             .channelInitializer { channel in
-                channel.pipeline.addHandler(ByteToMessageHandler(ByteBufToPacketDecoder()))
-                channel.pipeline.addHandler(MessageToByteHandler(ByteBufToLengthBufferEncoder()), name: "1", position: ChannelPipeline.Position.first)
-                channel.pipeline.addHandler(self, name: "3", position: ChannelPipeline.Position.last)
+                _ = channel.pipeline.addHandler(ByteToMessageHandler(ByteBufToPacketDecoder()))
+                _ = channel.pipeline.addHandler(MessageToByteHandler(ByteBufToLengthBufferEncoder()), name: "1", position: ChannelPipeline.Position.first)
+                _ = channel.pipeline.addHandler(self, name: "3", position: ChannelPipeline.Position.last)
                 return channel.pipeline.addHandler(MessageToByteHandler(PacketToByteBufEncoder()), name: "2", position: ChannelPipeline.Position.before(self))
             }
         defer {

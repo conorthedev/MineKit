@@ -36,9 +36,7 @@ public class LoginSuccessReader : PacketReader {
         
         let uuid = try mutableBuffer.readString()
         let username = try mutableBuffer.readString()
-        
-        print("🐛 [LoginSuccessReader]: Username: \(username) | UUID: \(uuid)")
-        
+                
         return LoginSuccessPacket(username: username, uuid: uuid)
     }
 }

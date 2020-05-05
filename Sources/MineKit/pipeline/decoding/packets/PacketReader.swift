@@ -13,7 +13,7 @@ public enum PacketDirection {
 }
 
 public enum ConnectionState {
-    case HANDSHAKE, LOGIN
+    case HANDSHAKE, LOGIN, PLAY
 }
 
 public protocol PacketReader {

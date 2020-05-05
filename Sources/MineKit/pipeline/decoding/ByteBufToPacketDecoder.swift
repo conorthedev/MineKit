@@ -15,9 +15,10 @@ public enum MKPacketError : Error {
 final class ByteBufToPacketDecoder : ByteToMessageDecoder {
     typealias InboundOut = MineKitPacket
     var packetDecoderMap = [
-        1: EncryptionRequestReader(),
-        2: LoginSuccessReader(),
-        3: SetCompressionReader()
+        0x01: EncryptionRequestReader(),
+        0x02: LoginSuccessReader(),
+        0x03: SetCompressionReader(),
+        0x26: JoinGameReader()
     ] as [Int : PacketReader]
 
     func decode(context: ChannelHandlerContext, buffer: inout ByteBuffer) throws -> DecodingState {
@@ -56,7 +57,7 @@ final class ByteBufToPacketDecoder : ByteToMessageDecoder {
             buffer.moveReaderIndex(forwardBy: buffer.readableBytes)
             return .needMoreData
         } else {
-            throw MKPacketError.cannotParse("Unable to parse packet: \(packetID)")
+            throw MKPacketError.cannotParse("Unable to parse packet: 0x\(String(format:"%02X", packetID))")
         }
     }
 }
