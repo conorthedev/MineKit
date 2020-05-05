@@ -4,7 +4,7 @@ import NIO
 @testable import MineKit
 
 final class MineKitTests: XCTestCase, ChannelInboundHandler {
-    let defaultHost = "localhost"
+    let defaultHost = "systemless.me"
     let defaultPort: Int = 25565
 
     public typealias InboundIn = MineKitPacket
@@ -13,8 +13,17 @@ final class MineKitTests: XCTestCase, ChannelInboundHandler {
            
     public func channelActive(context: ChannelHandlerContext) {
         print("🌐 Client connected to \(context.remoteAddress!)")
-        let minekit = MineKit(hostname: defaultHost, port: defaultPort, context: context, username: "ConorDoesMC")
-        minekit.connectToServer()
+        
+        var minekit = MineKit.shared
+        minekit.setup(hostname: defaultHost, port: defaultPort, context: context, username: "ConorDoesMC")
+        
+        do {
+            try minekit.connectToServer()
+        } catch let error {
+            print("🚫 Error:", error)
+            context.close(promise: nil)
+            XCTFail("Error occured: \(error)")
+        }
     }
 
     public func channelRead(context: ChannelHandlerContext, data: NIOAny) {
