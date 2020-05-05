@@ -23,9 +23,7 @@ final class ByteBufToPacketDecoder : ByteToMessageDecoder {
 
     func decode(context: ChannelHandlerContext, buffer: inout ByteBuffer) throws -> DecodingState {
         buffer.moveReaderIndex(to: 0)
-        
-        //print(buffer.getBytes(at: 0, length: 4))
-        
+                
         if(buffer.readableBytes == 0) {
             return .needMoreData
         }
@@ -41,7 +39,7 @@ final class ByteBufToPacketDecoder : ByteToMessageDecoder {
         // Slice the buffer from the byte after the varint to the packet length
         var minekitSlicedBuf = MineKitBuffer(withByteBuffer: minekitBuf.buffer.getSlice(at: minekitBuf.buffer.readerIndex, length: packetLength)!)
         let packetID = try minekitSlicedBuf.readVarInt()
-        print("ℹ️ Parsing packet with ID 0x\(String(format:"%02X", packetID)) of length \(packetLength)")
+        MineKit.shared.logger.info("Parsing packet with ID 0x\(String(format:"%02X", packetID)) of length \(packetLength)")
 
         if(packetDecoderMap.contains(where: { (arg0) -> Bool in
             let (key, _) = arg0

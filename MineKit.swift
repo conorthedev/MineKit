@@ -1,4 +1,6 @@
+import Foundation
 import NIO
+import Logging
 
 public enum MineKitError : Error {
     case notSetup(String)
@@ -6,6 +8,8 @@ public enum MineKitError : Error {
 
 public struct MineKit {
     static var shared = MineKit()
+    
+    public var logger = Logger(label: "dev.cbyrne.MineKit")
 
     var hostname: String = "not setup"
     var port: Int = 0
@@ -40,8 +44,8 @@ public struct MineKit {
         if(!isReady) {
             throw MineKitError.notSetup("MineKit was not setup! Setup with MineKit.shared.setup(...)")
         }
-        print("📨 Sending packet: \(String(describing: packet))")
+        logger.info("Sending packet: \(String(describing: packet))")
         context!.writeAndFlush(NIOAny(packet), promise: nil)
-        print("📩 Sent packet: \(String(describing: packet))")
+        logger.info("Sent packet: \(String(describing: packet))")
     }
 }

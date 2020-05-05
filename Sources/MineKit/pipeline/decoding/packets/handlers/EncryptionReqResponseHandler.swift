@@ -15,7 +15,7 @@ public class EncryptionReqResponseHandler : MineKitRequestHandler {
         // This is the encryption packet ( we can assume ) so we just cast to EncryptionRequestPacket   
         let castedPacket = packet as! EncryptionRequestPacket
         
-        print(castedPacket.publicKey)
+        MineKit.shared.logger.debug("\(castedPacket.publicKey)")
         
         return .success
     }

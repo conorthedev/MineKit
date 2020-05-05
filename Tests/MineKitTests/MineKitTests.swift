@@ -12,15 +12,15 @@ final class MineKitTests: XCTestCase, ChannelInboundHandler {
     public typealias OutboundOut = MineKitPacket
            
     public func channelActive(context: ChannelHandlerContext) {
-        print("🌐 Client connected to \(context.remoteAddress!)")
-        
         var minekit = MineKit.shared
         minekit.setup(hostname: defaultHost, port: defaultPort, context: context, username: "ConorDoesMC")
+        
+        minekit.logger.info("Client connected to \(context.remoteAddress!)")
         
         do {
             try minekit.connectToServer()
         } catch let error {
-            print("🚫 Error:", error)
+            MineKit.shared.logger.error("Error: \(error)")
             context.close(promise: nil)
             XCTFail("Error occured: \(error)")
         }
@@ -30,20 +30,20 @@ final class MineKitTests: XCTestCase, ChannelInboundHandler {
         let packet = self.unwrapInboundIn(data)
         let handler = MineKitRequestManager.packetHandlerMap[packet.packetID]
 
-        print("💬 Got packet \(String(describing: packet))")
+        MineKit.shared.logger.debug("Got packet \(String(describing: packet))")
         
         if(handler != nil) {
             let resp = handler!.handle(context: context, packet: packet)
             if(resp == .success) {
-                print("✅ Successfully handled packet \(String(describing: packet))")
+                MineKit.shared.logger.info("Successfully handled packet \(String(describing: packet))")
             } else {
-                print("🚫 Failed to handle packet, see stacktrace for errors")
+                MineKit.shared.logger.error("Failed to handle packet, see stacktrace for errors")
             }
         }
     }
 
     public func errorCaught(context: ChannelHandlerContext, error: Error) {
-        print("🚫 Error:", error)
+        MineKit.shared.logger.error("Error: \(error)")
         context.close(promise: nil)
         XCTFail("Error occured: \(error)")
     }
@@ -81,11 +81,11 @@ final class MineKitTests: XCTestCase, ChannelInboundHandler {
             // Will be closed after we echo-ed back to the server.
             try channel.closeFuture.wait()
         } catch let error {
-            print("🚫 Error: \(error)")
+            MineKit.shared.logger.error("Error: \(error)")
             XCTFail("Error occured: \(error)")
         }
 
-        print("🚪 Client closed!")
+        MineKit.shared.logger.info("Client closed!")
         XCTAssertTrue(true)
     }
 
