@@ -30,7 +30,22 @@ final class ByteBufToPacketDecoder : ByteToMessageDecoder {
 
         // Cast our buffer to MineKitBuffer and get the length (which is a VarInt like wtf minecraft use normal shit)
         var minekitBuf = MineKitBuffer(withByteBuffer: buffer)
-        let packetLength = try minekitBuf.readVarInt()
+        var numRead = 0
+        var packetLength = 0
+        var read: Int = 0
+        repeat {
+            if(buffer.readableBytes == 0) {
+                return .needMoreData
+            }
+            
+            read = Int(minekitBuf.readByte())
+            let value = read & 0b01111111
+            packetLength = packetLength | (value << (7 * numRead))
+            numRead += 1
+            if(numRead > 5) {
+                throw MKBufferError.readError("VarInt too large!")
+            }
+        } while((read & 0b10000000) != 0)
 
         if(buffer.readableBytes < packetLength) {
             return .needMoreData
