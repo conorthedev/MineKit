@@ -18,12 +18,16 @@ final class ByteBufToPacketDecoder : ByteToMessageDecoder {
         0x01: EncryptionRequestReader(),
         0x02: LoginSuccessReader(),
         0x03: SetCompressionReader(),
-        0x26: JoinGameReader()
-    ] as [Int : PacketReader]
+        0x19: PluginMessageReader(),
+        0x26: JoinGameReader(),
+        0x32: PlayerAbilitiesReader(),
+        0x34: PlayerInfoReader(),
+        0x40: HeldItemChangeReader(),
+        0x0E: ServerDifficultyReader(),
+        0x5B: DeclareRecipesReader()
+    ] as [Int : MineKitPacketReader]
 
     func decode(context: ChannelHandlerContext, buffer: inout ByteBuffer) throws -> DecodingState {
-        buffer.moveReaderIndex(to: 0)
-                
         if(buffer.readableBytes == 0) {
             return .needMoreData
         }
@@ -34,7 +38,7 @@ final class ByteBufToPacketDecoder : ByteToMessageDecoder {
         var packetLength = 0
         var read: Int = 0
         repeat {
-            if(buffer.readableBytes == 0) {
+            if(minekitBuf.buffer.readableBytes == 0) {
                 return .needMoreData
             }
             
@@ -46,16 +50,18 @@ final class ByteBufToPacketDecoder : ByteToMessageDecoder {
                 throw MineKitBufferError.readError("VarInt too large!")
             }
         } while((read & 0b10000000) != 0)
-
-        if(buffer.readableBytes < packetLength) {
+        
+        if(minekitBuf.buffer.readableBytes < packetLength) {
             return .needMoreData
         }
                 
         // Slice the buffer from the byte after the varint to the packet length
-        var minekitSlicedBuf = MineKitBuffer(withByteBuffer: minekitBuf.buffer.getSlice(at: minekitBuf.buffer.readerIndex, length: packetLength)!)
+        let slicedBuffer = minekitBuf.buffer.getSlice(at: minekitBuf.buffer.readerIndex, length: packetLength)!
+        var minekitSlicedBuf = MineKitBuffer(withByteBuffer: slicedBuffer)
         let packetID = try minekitSlicedBuf.readVarInt()
-        MineKit.shared.logger.info("Parsing packet with ID 0x\(String(format:"%02X", packetID)) of length \(packetLength)")
-
+            
+        MineKit.shared.logger.info("Parsing packet \(packetID) or 0x\(String(format:"%02X", packetID)) of length \(packetLength)")
+        
         if(packetDecoderMap.contains(where: { (arg0) -> Bool in
             let (key, _) = arg0
             if(key == packetID) {
@@ -64,13 +70,13 @@ final class ByteBufToPacketDecoder : ByteToMessageDecoder {
                 return false
             }
         })) {
-            let packet = try packetDecoderMap[packetID]!.toPacket(fromBuffer: minekitSlicedBuf)
+            let packet = try packetDecoderMap[packetID]!.toPacket(fromBuffer: &minekitSlicedBuf)
+            buffer = minekitSlicedBuf.buffer
 
             context.fireChannelRead(NIOAny(packet))
-            buffer.moveReaderIndex(forwardBy: buffer.readableBytes)
             return .needMoreData
         } else {
-            throw MineKitPacketError.cannotParse("Unable to parse packet: 0x\(String(format:"%02X", packetID))")
+            throw MineKitPacketError.cannotParse("Unable to parse packet: \(packetID)")
         }
     }
 }

@@ -22,14 +22,16 @@ public class SetCompressionPacket : MineKitPacket {
 }
 
 
-public class SetCompressionReader : PacketReader {
+public class SetCompressionReader : MineKitPacketReader {
     public var packetID: Int = 0x03
     public var packetDirection: PacketDirection = .SERVER
     public var connectionState: ConnectionState = .LOGIN
     
-    public func toPacket(fromBuffer: MineKitBuffer) throws -> MineKitPacket {
+    public func toPacket(fromBuffer: inout MineKitBuffer) throws -> MineKitPacket {
         var mutableBuffer = fromBuffer
         let threshold = try mutableBuffer.readVarInt()
+        
+        fromBuffer = mutableBuffer
         
         return SetCompressionPacket(threshold: threshold)
     }

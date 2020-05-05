@@ -39,12 +39,12 @@ public class JoinGamePacket : MineKitPacket {
 }
 
 
-public class JoinGameReader : PacketReader {
+public class JoinGameReader : MineKitPacketReader {
     public var packetID: Int = 0x26
     public var packetDirection: PacketDirection = .SERVER
     public var connectionState: ConnectionState = .PLAY
     
-    public func toPacket(fromBuffer: MineKitBuffer) throws -> MineKitPacket {
+    public func toPacket(fromBuffer: inout MineKitBuffer) throws -> MineKitPacket {
         var mutableBuffer = fromBuffer
         
         let eid = mutableBuffer.buffer.readInteger(endianness: .big, as: Int32.self)
@@ -66,6 +66,8 @@ public class JoinGameReader : PacketReader {
         let viewDistance = try mutableBuffer.readVarInt()
         let reducedDebug = mutableBuffer.readByte() != 0
         let respawnScreen = mutableBuffer.readByte() != 0
+        
+        fromBuffer = mutableBuffer
         
         return JoinGamePacket(eid: eid!, gamemode: gamemode, dimension: dimension!, hashedSeed: hashedSeed!, maxPlayers: maxPlayers, levelType: levelType, viewDistance: viewDistance, reducedDebug: reducedDebug, respawnScreen: respawnScreen)
     }

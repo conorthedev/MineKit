@@ -26,16 +26,18 @@ public class LoginSuccessPacket : MineKitPacket {
 }
 
 
-public class LoginSuccessReader : PacketReader {
+public class LoginSuccessReader : MineKitPacketReader {
     public var packetID: Int = 0x02
     public var packetDirection: PacketDirection = .SERVER
     public var connectionState: ConnectionState = .LOGIN
     
-    public func toPacket(fromBuffer: MineKitBuffer) throws -> MineKitPacket {
+    public func toPacket(fromBuffer: inout MineKitBuffer) throws -> MineKitPacket {
         var mutableBuffer = fromBuffer
         
         let uuid = try mutableBuffer.readString()
         let username = try mutableBuffer.readString()
+        
+        fromBuffer = mutableBuffer
                 
         return LoginSuccessPacket(username: username, uuid: uuid)
     }
