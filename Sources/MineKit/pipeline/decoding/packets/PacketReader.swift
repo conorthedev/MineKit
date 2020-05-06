@@ -8,14 +8,6 @@
 import Foundation
 import NIO
 
-public enum PacketDirection {
-    case CLIENT, SERVER
-}
-
-public enum ConnectionState {
-    case HANDSHAKE, LOGIN, PLAY
-}
-
 public protocol PacketReader {
     var packetID: Int { get }
     var packetDirection: PacketDirection { get }
