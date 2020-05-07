@@ -31,6 +31,47 @@ public struct MineKitBuffer {
         let byte = buffer.readInteger(endianness: Endianness.big, as: UInt8.self)
         return byte ?? 0
     }
+
+    public mutating func readSignedByte() -> Int8 {
+        let byte = buffer.readInteger(endianness: Endianness.big, as: Int8.self)
+        return byte ?? 0
+    }
+
+    public mutating func readShort() -> UInt16 {
+        let value = buffer.readInteger(endianness: Endianness.big, as: UInt16.self)
+        return value ?? 0
+    }
+
+    public mutating func writeSignedByte(value: Int8) {
+        buffer.writeInteger(value, endianness: Endianness.big)
+    }
+
+    public mutating func readSignedShort() -> Int16 {
+        let byte = buffer.readInteger(endianness: Endianness.big, as: Int16.self)
+        return byte ?? 0
+    }
+
+    public mutating func writeSignedShort(value: Int16) {
+        buffer.writeInteger(value, endianness: Endianness.big)
+    }
+
+    public mutating func readSignedInt() -> Int32 {
+        let byte = buffer.readInteger(endianness: Endianness.big, as: Int32.self)
+        return byte ?? 0
+    }
+
+    public mutating func writeSignedInt(value: Int32) {
+        buffer.writeInteger(value, endianness: Endianness.big)
+    }
+
+    public mutating func readSignedLong() -> Int64 {
+        let byte = buffer.readInteger(endianness: Endianness.big, as: Int64.self)
+        return byte ?? 0
+    }
+
+    public mutating func writeSignedLong(value: Int64) {
+        buffer.writeInteger(value, endianness: Endianness.big)
+    }
     
     public mutating func writeVarInt(value: Int) {
         var toWrite = value
@@ -79,6 +120,30 @@ public struct MineKitBuffer {
     }
     
     public mutating func writeShort(value: Int) {
-        buffer.writeInteger(Int16(value))
+        buffer.writeInteger(Int16(value), endianness: Endianness.big)
+    }
+
+    public mutating func writeFloat(value: Float32) {
+        buffer.writeInteger(value.bitPattern, endianness: Endianness.big)
+    }
+
+    public mutating func readFloat() -> Float32 {
+        return Float32(bitPattern: UInt32(bigEndian: fromByteArray(buffer.readBytes(length: 4)!, UInt32.self)))
+    }
+
+    public mutating func writeDouble(value: Float64) {
+        buffer.writeInteger(value.bitPattern, endianness: Endianness.big)
+    }
+
+    public mutating func readDouble() -> Float64 {
+        return Float64(bitPattern: UInt64(bigEndian: fromByteArray(buffer.readBytes(length: 8)!, UInt64.self)))
+    }
+
+    public mutating func writeNBT(tag: NBTTag) {
+        tag.writeTo(buffer: &self)
+    }
+
+    public mutating func readNBT() throws -> NBTTag {
+        return try NBTTags.read(tagId: readByte(), buffer: &self)
     }
 }
