@@ -10,6 +10,7 @@ import NIO
 
 public enum MineKitPacketError : Error {
     case cannotParse(String)
+    case parsingFailed(String)
 }
 
 final class ByteBufToPacketDecoder : ByteToMessageDecoder {
@@ -72,6 +73,10 @@ final class ByteBufToPacketDecoder : ByteToMessageDecoder {
         })) {
             let packet = try packetDecoderMap[packetID]!.toPacket(fromBuffer: &minekitSlicedBuf)
             buffer = minekitSlicedBuf.buffer
+
+            if (buffer.readableBytes > 0) {
+                throw MineKitPacketError.parsingFailed("Packet \(packetID) wasn't fully read (\(buffer.readableBytes) bytes left)")
+            }
 
             context.fireChannelRead(NIOAny(packet))
             return .needMoreData
