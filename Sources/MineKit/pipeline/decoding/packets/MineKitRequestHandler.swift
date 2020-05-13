@@ -19,6 +19,7 @@ public protocol MineKitRequestHandler {
 
 public class MineKitRequestManager {
     public static var packetHandlerMap = [
-        0x01: EncryptionReqResponseHandler()
+        0x01: EncryptionReqResponseHandler(),
+        0x04: LoginPluginRequestHandler()
     ] as [UInt8 : MineKitRequestHandler]
 }

@@ -26,5 +26,6 @@ public class EncryptionRequestReader : MineKitPacketReader {
 
         return EncryptionRequestPacket(serverID: serverID, publicKeyLength: publicKeyLength, publicKey: publicKey, tokenLength: tokenLength, verifyToken: verifyToken)
     }
+
 }
 

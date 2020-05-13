@@ -4,7 +4,7 @@ import NIO
 @testable import MineKit
 
 final class MineKitTests: XCTestCase, ChannelInboundHandler {
-    let defaultHost = "systemless.me"
+    let defaultHost = "78.47.18.216"
     let defaultPort: Int = 25565
 
     public typealias InboundIn = MineKitPacket

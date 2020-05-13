@@ -16,9 +16,11 @@ public enum MineKitPacketError : Error {
 final class ByteBufToPacketDecoder : ByteToMessageDecoder {
     typealias InboundOut = MineKitPacket
     var packetDecoderMap = [
+        0x00: DisconnectLoginReader(),
         0x01: EncryptionRequestReader(),
         0x02: LoginSuccessReader(),
         0x03: SetCompressionReader(),
+        0x04: LoginPluginReqReader(),
         0x19: PluginMessageReader(),
         0x26: JoinGameReader(),
         0x32: PlayerAbilitiesReader(),
@@ -71,7 +73,9 @@ final class ByteBufToPacketDecoder : ByteToMessageDecoder {
                 return false
             }
         })) {
-            let packet = try packetDecoderMap[packetID]!.toPacket(fromBuffer: &minekitSlicedBuf)
+            let reader = packetDecoderMap[packetID]!
+            let packet = try reader.toPacket(fromBuffer: &minekitSlicedBuf)
+            
             buffer = minekitSlicedBuf.buffer
 
             if (buffer.readableBytes > 0) {
@@ -79,6 +83,7 @@ final class ByteBufToPacketDecoder : ByteToMessageDecoder {
             }
 
             context.fireChannelRead(NIOAny(packet))
+            
             return .needMoreData
         } else {
             throw MineKitPacketError.cannotParse("Unable to parse packet: \(packetID)")

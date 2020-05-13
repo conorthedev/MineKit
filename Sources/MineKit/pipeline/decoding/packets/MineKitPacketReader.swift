@@ -13,7 +13,7 @@ public enum PacketDirection {
 }
 
 public enum ConnectionState {
-    case HANDSHAKE, LOGIN, PLAY
+    case HANDSHAKE, LOGIN, PLAY, STATUS
 }
 
 public protocol MineKitPacketReader {

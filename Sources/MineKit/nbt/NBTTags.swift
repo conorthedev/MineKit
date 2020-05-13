@@ -15,7 +15,6 @@ public final class NBTTags {
     ] as [UInt8 : NBTTagReader]
 
     public static func read(tagId: UInt8, buffer: inout MineKitBuffer) throws -> NBTTag {
-        print("bruh \(tagId) \(readerMap) \(readerMap[tagId])")
         return try readerMap[tagId]!.toTag(fromBuffer: &buffer)
     }
 }
